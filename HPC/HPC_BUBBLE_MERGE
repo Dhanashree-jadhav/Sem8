@@ -1,0 +1,108 @@
+#include <bits/stdc++.h>
+#include <omp.h>
+using namespace std;
+
+// Display function
+void display(vector<int>& arr) {
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+}
+
+// -------- Parallel Bubble Sort --------
+void parallelBubbleSort(vector<int>& arr) {
+    int n = arr.size();
+
+    for (int i = 0; i < n; i++) {
+        if (i % 2 == 0) {
+            #pragma omp parallel for
+            for (int j = 0; j < n - 1; j += 2) {
+                if (arr[j] > arr[j + 1])
+                    swap(arr[j], arr[j + 1]);
+            }
+        } else {
+            #pragma omp parallel for
+            for (int j = 1; j < n - 1; j += 2) {
+                if (arr[j] > arr[j + 1])
+                    swap(arr[j], arr[j + 1]);
+            }
+        }
+    }
+}
+
+// -------- Merge Function --------
+void merge(vector<int>& arr, int low, int mid, int high) {
+    vector<int> temp;
+    int i = low, j = mid + 1;
+
+    while (i <= mid && j <= high) {
+        if (arr[i] <= arr[j]) temp.push_back(arr[i++]);
+        else temp.push_back(arr[j++]);
+    }
+
+    while (i <= mid) temp.push_back(arr[i++]);
+    while (j <= high) temp.push_back(arr[j++]);
+
+    for (int k = 0; k < temp.size(); k++)
+        arr[low + k] = temp[k];
+}
+
+// -------- Parallel Merge Sort --------
+void parallelMergeSort(vector<int>& arr, int low, int high) {
+    if (low >= high) return;
+
+    int mid = (low + high) / 2;
+
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        parallelMergeSort(arr, low, mid);
+
+        #pragma omp section
+        parallelMergeSort(arr, mid + 1, high);
+    }
+
+    merge(arr, low, mid, high);
+}
+
+// -------- Main --------
+int main() {
+    int n;
+    cout << "Enter size: ";
+    cin >> n;
+
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++)
+        arr[i] = n - i;  // worst case
+
+    cout << "Original Array:\n";
+    display(arr);
+
+    vector<int> a1 = arr, a2 = arr;
+
+    // Parallel Bubble Sort
+    parallelBubbleSort(a1);
+    cout << "\nParallel Bubble Sorted:\n";
+    display(a1);
+
+    // Parallel Merge Sort
+    parallelMergeSort(a2, 0, n - 1);
+    cout << "\nParallel Merge Sorted:\n";
+    display(a2);
+
+    return 0;
+}
+
+
+
+
+OUTPUT :
+
+Enter size: 4
+Original Array:
+4 3 2 1
+
+Parallel Bubble Sorted:
+1 2 3 4
+
+Parallel Merge Sorted:
+1 2 3 4
