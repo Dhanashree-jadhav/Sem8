@@ -21,9 +21,13 @@ Runtime → Change runtime type → GPU → Save
 Run this in first cell:
 
 !pip install git+https://github.com/afnan47/cuda.git
+
+
 4️⃣ Load Extension
 %load_ext nvcc_plugin
+
 5️⃣ Run Vector Addition
+
 %%cu
 #include <iostream>
 using namespace std;
@@ -60,7 +64,10 @@ int main() {
 
     return 0;
 }
+
+
 6️⃣ Run Matrix Multiplication
+
 %%cu
 #include <iostream>
 using namespace std;
@@ -110,3 +117,4 @@ int main() {
 
     return 0;
 }
+
