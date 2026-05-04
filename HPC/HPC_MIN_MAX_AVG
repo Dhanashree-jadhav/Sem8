@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+#include <omp.h>
+using namespace std;
+
+int main() {
+    int N;
+    cout << "Enter size: ";
+    cin >> N;
+
+    vector<int> arr(N);
+
+    // Generate random array
+    for(int i = 0; i < N; i++)
+        arr[i] = rand() % 1000;
+
+    // -------- Parallel Reduction --------
+    int min_val = INT_MAX, max_val = INT_MIN, sum = 0;
+
+    #pragma omp parallel for reduction(min:min_val) reduction(max:max_val) reduction(+:sum)
+    for(int i = 0; i < N; i++) {
+        if(arr[i] < min_val) min_val = arr[i];
+        if(arr[i] > max_val) max_val = arr[i];
+        sum += arr[i];
+    }
+
+    double avg = (double)sum / N;
+
+    // -------- Output --------
+    cout << "\nResults:\n";
+    cout << "Min: " << min_val << endl;
+    cout << "Max: " << max_val << endl;
+    cout << "Sum: " << sum << endl;
+    cout << "Avg: " << avg << endl;
+
+    return 0;
+}
+
+
+
+OUTPUT:
+
+Enter size: 5
+
+Results:
+Min: 41
+Max: 500
+Sum: 1511
+Avg: 302.2
+
+--------------------------------
+Process exited after 2.996 seconds with return value 0
+Press any key to continue . . 
